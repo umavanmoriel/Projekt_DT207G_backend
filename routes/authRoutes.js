@@ -1,4 +1,8 @@
+//Routes för autentisering
+
+// Importera express
 const express = require("express");
+// Skapa en router
 const router = express.Router();
 // Importera mongoose
 const mongoose = require("mongoose");
@@ -13,36 +17,61 @@ mongoose.connect(process.env.DATABASE).then(() => {
     console.error("Error connecting to database...");
 });
 
+//User model
+const User = require("../models/user");
+
 //Lägger till nya användare
 router.post("/register", async (req, res) => {
     try {
+         // Importera User-modell
         const { username, password } = req.body;
-        //Validerar input
+
+        //Validera input, båda fälten måste finnas
         if (!username || !password) {
-            return res.status(400).json({ error: "Invalid input, send username and password"});
+            return res.status(400).json({ error: "Ogiltig inmatning! Ange användarnamn och lösenord!"});
         }
-        //Correct - save user
+
+        // Skapa en ny användare
+        const user = new User({ username, password });
+        await user.save();  
         res.status(201).json({ message: "User created"});
 
     } catch (error) {
-        res.status(500).json({ error: "Server error"});
+        console.error("REGISTER ERROR:", error.message);
+        // Kontrollerar dubblett för användarnamn
+        if (error.code === 11000) {
+            return res.status(409).json({ error: "Användarnamnet finns redan" });
+        }
+        res.status(500).json({error:"Server error"});
     }
 });
 
 //Loggar in användare
 router.post("/login", async (req, res) => {
     try {
+        // Hämtar username och password
         const { username, password } = req.body;
         //Validerar input
         if (!username || !password) {
-            return res.status(400).json({ error: "Invalid input, send username and password"});
+            return res.status(400).json({ error: "Ogiltig inmatning! Ange användarnamn och lösenord!"});
         }
 
-        //Check credentials
-        if(username === "username" && password === "password") {
-            res.status(200).json({message: "Login succesful"});
+        // Kontrollerar inloggningsuppgifter
+
+        //Existerar användare?
+        const user = await User.findOne({ username });
+        if (!user) {
+            //Fel användarnamn eller lösenord
+            return res.status(401).json({ error: "Fel användarnamn/lösenord!"});
+        }
+
+        //Kontrollera lösenord
+        const isPasswordMatch = await user.comparePassword(password);
+        if (!isPasswordMatch) {
+            return res.status(401).json({ error: "Fel användarnamn/lösenord!"});
         } else {
-            res.status(401).json({error: "Invalid username/password"});
+            // Inloggningen lyckades
+            res.status(200).json({ message: "Inloggningen lyckades!"});
         }
         
     } catch (error) {
@@ -51,4 +80,5 @@ router.post("/login", async (req, res) => {
 
 })
 
+// Exportera routern
 module.exports = router;
