@@ -1,5 +1,17 @@
 const express = require("express");
 const router = express.Router();
+// Importera mongoose
+const mongoose = require("mongoose");
+// Läser in miljövariabler från .env fil
+require("dotenv").config();
+
+//Ansluter till MongoDB
+mongoose.set("strictQuery", false);
+mongoose.connect(process.env.DATABASE).then(() => {
+    console.log("Connected to MongoDB");
+}).catch((error) => {
+    console.error("Error connecting to database...");
+});
 
 //Lägger till nya användare
 router.post("/register", async (req, res) => {
