@@ -6,6 +6,8 @@ const express = require("express");
 const router = express.Router();
 // Importera mongoose
 const mongoose = require("mongoose");
+// Importerar JWT
+const jwt = require("jsonwebtoken");
 // Läser in miljövariabler från .env fil
 require("dotenv").config();
 
@@ -70,8 +72,16 @@ router.post("/login", async (req, res) => {
         if (!isPasswordMatch) {
             return res.status(401).json({ error: "Fel användarnamn/lösenord!"});
         } else {
+            //Skapa en JWT om allt stämmer och stoppar in användarnamn i token
+            const payload = { username: username};
+            // Signerar token med hemliga nyckel vilket är giltig i 1 timme
+            const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+            const response = {
+                message: "User logged in!!",
+                token: token
+            }
             // Inloggningen lyckades
-            res.status(200).json({ message: "Inloggningen lyckades!"});
+            res.status(200).json({ response});
         }
         
     } catch (error) {
