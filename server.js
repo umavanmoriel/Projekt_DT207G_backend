@@ -6,17 +6,21 @@ const bodyParser = require("body-parser");
 const authRoutes = require("./routes/authRoutes");
 // Importera jsonwebtoken
 const jwt = require("jsonwebtoken");
+//Importera cors för att tillåta anrop från frontend
+const cors = require("cors");
 // Läser in miljövariabler från .env fil
 require("dotenv").config();
 
 // Skapar en Express applikation
 const app = express();
+app.use(cors());
 const port = process.env.PORT || 3000;
 // Använd porten från .env eller porten 3000
 app.use(bodyParser.json());
 
 //Routes
 app.use("/api", authRoutes);
+
 
 //Skyddad routes
 app.get("/api/protected", authenticateToken, (req, res) => {
