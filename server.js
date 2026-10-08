@@ -8,6 +8,8 @@ const authRoutes = require("./routes/authRoutes");
 const jwt = require("jsonwebtoken");
 //Importera cors för att tillåta anrop från frontend
 const cors = require("cors");
+// Importerar dishRoutes
+const dishRoutes = require("./routes/dishRoutes");
 // Läser in miljövariabler från .env fil
 require("dotenv").config();
 
@@ -17,6 +19,9 @@ app.use(cors());
 const port = process.env.PORT || 3000;
 // Använd porten från .env eller porten 3000
 app.use(bodyParser.json());
+
+// Routes för rätter
+app.use("/api", dishRoutes);
 
 //Routes
 app.use("/api", authRoutes);
