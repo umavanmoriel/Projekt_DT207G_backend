@@ -10,6 +10,8 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 // Importerar dishRoutes
 const dishRoutes = require("./routes/dishRoutes");
+// Importerar bookingRoutes
+const bookingRoutes = require("./routes/bookingRoutes");
 // Läser in miljövariabler från .env fil
 require("dotenv").config();
 
@@ -22,6 +24,8 @@ app.use(bodyParser.json());
 
 // Routes för rätter
 app.use("/api", dishRoutes);
+// Använder bookingRoutes
+app.use("/api", bookingRoutes);
 
 //Routes
 app.use("/api", authRoutes);
