@@ -4,14 +4,16 @@ const express = require("express");
 const bodyParser = require("body-parser");
 // Importerar authRoutes
 const authRoutes = require("./routes/authRoutes");
-// Importera jsonwebtoken
+// Importerar jsonwebtoken
 const jwt = require("jsonwebtoken");
-//Importera cors för att tillåta anrop från frontend
+// Importerar cors för att tillåta anrop från frontend
 const cors = require("cors");
 // Importerar dishRoutes
 const dishRoutes = require("./routes/dishRoutes");
 // Importerar bookingRoutes
 const bookingRoutes = require("./routes/bookingRoutes");
+// Importerar messageRoutes
+const messageRoutes = require("./routes/messageRoutes");
 // Läser in miljövariabler från .env fil
 require("dotenv").config();
 
@@ -26,17 +28,17 @@ app.use(bodyParser.json());
 app.use("/api", dishRoutes);
 // Använder bookingRoutes
 app.use("/api", bookingRoutes);
-
-//Routes
+// Använder messageRoutes
+app.use("/api", messageRoutes);
+// Routes för autentisering
 app.use("/api", authRoutes);
 
-
-//Skyddad routes
+// Skyddad route
 app.get("/api/protected", authenticateToken, (req, res) => {
     res.json({ message: "Skyddad route!" });
 });
 
-//Validera token
+// Validera token
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -48,9 +50,8 @@ function authenticateToken(req, res, next) {
 
     // Verifiera token med vår hemliga nyckel
     jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
-        //Nekar åtkomst om token är ogiltig eller har gått ut
+        // Nekar åtkomst om token är ogiltig eller har gått ut
         if (err) {
-            // Token finns men är inte giltig
             return res.status(403).json({ message: "Not correct JWT" });
         }
 
@@ -60,7 +61,7 @@ function authenticateToken(req, res, next) {
     });
 }
 
-//Startar applikation
+// Startar applikation
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-})
+});
