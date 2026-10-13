@@ -1,5 +1,4 @@
 // Skapar schema för bokningar i databasen
-
 // Importerar mongoose
 const mongoose = require("mongoose");
 
@@ -39,13 +38,19 @@ const bookingSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    // Status: pending, confirmed eller cancelled
+    status: {
+        type: String,
+        default: "pending",
+        enum: ["pending", "confirmed", "cancelled"]
+    },
     // När bokningen skapades
     created: {
         type: Date,
         default: Date.now
     }
 }, {
-    // Tvingar collection namnet till "booking" annars blir "bookings"
+    // Tvingar collection-namnet till "booking"
     collection: "booking"
 });
 

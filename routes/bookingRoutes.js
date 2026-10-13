@@ -43,5 +43,54 @@ router.get("/bookings", async (req, res) => {
     }
 });
 
+// Uppdaterar status på en bokning
+router.put("/bookings/:id", async (req, res) => {
+    try {
+        // Hämtar status från requestens body
+        const { status } = req.body;
+
+        // Validerar att status är giltig
+        if (!status || !["pending", "confirmed", "cancelled"].includes(status)) {
+            return res.status(400).json({ error: "Ogiltig status" });
+        }
+
+        // Uppdaterar bokningen
+        const updated = await booking.findByIdAndUpdate(
+            req.params.id,
+            { status },
+            { new: true }
+        );
+
+        // Om bokningen inte finns
+        if (!updated) {
+            return res.status(404).json({ error: "Bokningen hittades inte" });
+        }
+
+        // Skickar tillbaka den uppdaterade bokningen
+        res.json({ message: "Status uppdaterad", booking: updated });
+    } catch (error) {
+        console.error("BOOKING ERROR:", error);
+        res.status(500).json({ error: "Server error", message: error.message });
+    }
+});
+
+// Tar bort en bokning
+router.delete("/bookings/:id", async (req, res) => {
+    try {
+        // Tar bort bokningen från databasen
+        const deleted = await booking.findByIdAndDelete(req.params.id);
+
+        // Om bokningen inte finns
+        if (!deleted) {
+            return res.status(404).json({ error: "Bokningen hittades inte" });
+        }
+
+        res.json({ message: "Bokning borttagen" });
+    } catch (error) {
+        console.error("BOOKING ERROR:", error);
+        res.status(500).json({ error: "Server error", message: error.message });
+    }
+});
+
 // Exporterar routern
-module.exports = router; 
+module.exports = router;
