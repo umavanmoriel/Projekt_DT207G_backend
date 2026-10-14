@@ -76,12 +76,8 @@ router.post("/login", async (req, res) => {
             const payload = { username: username};
             // Signerar token med hemliga nyckel vilket är giltig i 1 timme
             const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
-            const response = {
-                message: "User logged in!!",
-                token: token
-            }
             // Inloggningen lyckades
-            res.status(200).json({ response});
+            res.status(200).json({ message: "User logged in!!", token: token });
         }
         
     } catch (error) {

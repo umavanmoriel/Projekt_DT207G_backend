@@ -1,3 +1,5 @@
+// Importerar middleware för JWT
+const { authenticateToken } = require("../middleware/auth");
 // Importerar express
 const express = require("express");
 // Skapar en router
@@ -22,7 +24,7 @@ router.get("/dishes", async (req, res) => {
 });
 
 // Lägger till en ny rätt
-router.post("/dishes", async (req, res) => {
+router.post("/dishes", authenticateToken, async (req, res) => {
     try {
         // Hämta data från requestens body
         const { name, category, price, description } = req.body;
@@ -49,10 +51,19 @@ router.post("/dishes", async (req, res) => {
 });
 
 // Uppdaterar en befintlig rätt
-router.put("/dishes/:id", async (req, res) => {
+router.put("/dishes/:id", authenticateToken, async (req, res) => {
     try {
         // Hämtar data från requestens body
         const { name, category, price, description } = req.body;
+
+        // Validerar att obligatoriska fält är ifyllda
+        if (!name || !category || !price) {
+            return res.status(400).json({ error: "Fyll i namn, kategori och pris" });
+        }
+        
+        if (typeof price !== "number" || price <= 0) {
+            return res.status(400).json({ error: "Pris måste vara ett positivt nummer" });
+        }
 
         // Uppdaterar rätten med angivet id
         const updated = await dish.findByIdAndUpdate(
@@ -77,7 +88,7 @@ router.put("/dishes/:id", async (req, res) => {
 });
 
 // Raderar en rätt
-router.delete("/dishes/:id", async (req, res) => {
+router.delete("/dishes/:id", authenticateToken, async (req, res) => {
     try {
         // Raderar rätten med angivet id
         const deleted = await dish.findByIdAndDelete(req.params.id);

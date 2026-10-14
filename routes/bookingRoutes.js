@@ -1,3 +1,5 @@
+// Importerar middleware för JWT
+const { authenticateToken } = require("../middleware/auth");
 // Importerar express
 const express = require("express");
 // Skapar en router
@@ -33,7 +35,7 @@ router.post("/bookings", async (req, res) => {
 });
 
 // Hämtar alla bokningar
-router.get("/bookings", async (req, res) => {
+router.get("/bookings", authenticateToken, async (req, res) => {
     try {
         const bookings = await booking.find().sort({ created: -1 });
         res.json(bookings);
@@ -44,7 +46,7 @@ router.get("/bookings", async (req, res) => {
 });
 
 // Uppdaterar status på en bokning
-router.put("/bookings/:id", async (req, res) => {
+router.put("/bookings/:id", authenticateToken, async (req, res) => {
     try {
         // Hämtar status från requestens body
         const { status } = req.body;
@@ -75,7 +77,7 @@ router.put("/bookings/:id", async (req, res) => {
 });
 
 // Tar bort en bokning
-router.delete("/bookings/:id", async (req, res) => {
+router.delete("/bookings/:id", authenticateToken, async (req, res) => {
     try {
         // Tar bort bokningen från databasen
         const deleted = await booking.findByIdAndDelete(req.params.id);

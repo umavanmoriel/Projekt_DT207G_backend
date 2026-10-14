@@ -1,3 +1,5 @@
+// Importerar middleware för JWT
+const { authenticateToken } = require("../middleware/auth");
 // Importerar express
 const express = require("express");
 // Skapar en router
@@ -33,7 +35,7 @@ router.post("/messages", async (req, res) => {
 });
 
 // Hämtar alla meddelanden
-router.get("/messages", async (req, res) => {
+router.get("/messages", authenticateToken, async (req, res) => {
     try {
         const messages = await message.find().sort({ created: -1 });
         res.json(messages);
